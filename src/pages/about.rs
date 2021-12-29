@@ -3,21 +3,15 @@ use yew_styles::layouts::{
     container::{Container, Direction, Wrap},
     item::{Item, ItemLayout},
 };
-use num_bigint::BigUint;
 
-pub struct PiCalc;
+pub struct About;
 
-struct State {
-    digit: i32,
-    result: BigUint,
-}
-
-impl Component for PiCalc {
+impl Component for About {
     type Message = ();
     type Properties = ();
 
     fn create(_: Self::Properties, _: ComponentLink<Self>) -> Self {
-        PiCalc {}
+        About {}
     }
 
     fn update(&mut self, _: Self::Message) -> ShouldRender {
