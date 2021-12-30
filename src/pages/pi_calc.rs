@@ -1,11 +1,8 @@
+use std::ffi::c_void;
 use crate::logics::pi_calc::gauss_legendre;
 use std::str::FromStr;
 use std::fmt::{Debug};
 use yew::prelude::*;
-use yew_styles::forms::form_input::{
-    FormInput,
-    InputType,
-};
 use yew_styles::text::{
     TextType,
     Text,
@@ -30,6 +27,8 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 pub enum Msg {
     Calc,
     InputDigit(String),
+    Calculating,
+    Calculated,
 }
 
 pub struct PiCalc {
@@ -61,18 +60,24 @@ impl Component for PiCalc {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         log::info!("Update: {:?}", msg);
+        let cb1 = self.link.callback(|_: Option<String>| Msg::Calculating);
+        let cb2 = self.link.callback(|_: Option<String>| Msg::Calculated);
         match msg {
             Msg::InputDigit(value) => {
-                log::info!("value: {:?}",value);
                 self.state.digit = value;
             }
             Msg::Calc => {
-                log::info!("calc!!!");
-                self.state.calculating = true;
+                cb1.emit(None);
                 let n: i64 = self.state.digit.parse().unwrap();
                 let t: BigDecimal = gauss_legendre(n);
-                log::info!("result: {:?}", format!("{}", t));
+                log::info!("result: {:?}", t);
                 self.state.result = t;
+                cb2.emit(None);
+            }
+            Msg::Calculating => {
+                self.state.calculating = true;
+            }
+            Msg::Calculated => {
                 self.state.calculating = false;
             }
         }
