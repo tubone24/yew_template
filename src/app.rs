@@ -8,9 +8,6 @@ use yew_styles::{
         navbar_container::NavbarContainer,
         navbar_item::NavbarItem,
     },
-    text::{
-        Header,
-    },
     styles::{Palette, Style},
 };
 

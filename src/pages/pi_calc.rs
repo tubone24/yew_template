@@ -1,18 +1,30 @@
 use crate::logics::pi_calc::gauss_legendre;
 use std::str::FromStr;
-use std::fmt::{Debug, Formatter};
+use std::fmt::{Debug};
 use yew::prelude::*;
 use yew_styles::forms::form_input::{
     FormInput,
     InputType,
 };
-use yew_styles::styles::Size;
+use yew_styles::text::{
+    TextType,
+    Text,
+};
+use stylist::css;
+use yew_styles::styles::{
+    Size,
+    Palette,
+};
+use yew_styles::spinner::{
+    Spinner,
+    SpinnerType
+};
 use yew_styles::layouts::{
     container::{Container, Direction, Wrap},
     item::{Item, ItemLayout},
 };
 
-use bigdecimal::BigDecimal;
+use bigdecimal::{BigDecimal, ToPrimitive};
 
 #[derive(Debug)]
 pub enum Msg {
@@ -27,6 +39,7 @@ pub struct PiCalc {
 
 struct State {
     digit: String,
+    calculating: bool,
     result: BigDecimal,
 }
 
@@ -37,6 +50,7 @@ impl Component for PiCalc {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         let state = State {
             digit: "10".to_string(),
+            calculating: false,
             result: BigDecimal::from_str("0").unwrap(),
         };
         PiCalc {
@@ -54,10 +68,12 @@ impl Component for PiCalc {
             }
             Msg::Calc => {
                 log::info!("calc!!!");
+                self.state.calculating = true;
                 let n: i64 = self.state.digit.parse().unwrap();
                 let t: BigDecimal = gauss_legendre(n);
                 log::info!("result: {:?}", format!("{}", t));
                 self.state.result = t;
+                self.state.calculating = false;
             }
         }
         true
@@ -70,6 +86,20 @@ impl Component for PiCalc {
     fn view(&self) -> Html {
         html! {
             <Container direction=Direction::Row wrap=Wrap::Wrap class_name="content">
+            {
+                if self.state.calculating {
+                    html! {
+                        <Spinner
+                            spinner_type=SpinnerType::Circle
+                            spinner_size=Size::Medium
+                            spinner_palette=Palette::Info/>
+                    }
+                } else {
+                    html! {
+                        <></>
+                    }
+                }
+            }
                 <Item layouts=vec!(ItemLayout::ItM(12))>
                     <h2>{"Calc PI by wasm!"}</h2>
                 </Item>
@@ -78,7 +108,16 @@ impl Component for PiCalc {
                     <button onclick=self.link.callback(|_| Msg::Calc)>{ "Calc" }</button>
                 </Item>
                 <Item layouts=vec!(ItemLayout::ItM(12))>
-                    <p>{self.state.result.to_string()}</p>
+                    <Text
+                        text_type=TextType::Paragraph
+                        text_size=Size::Small
+                        plain_text={self.state.result.to_string()}
+                        html_text=None
+                        styles=css!("
+                            overflow-wrap: break-word;
+                            word-break: break-all;
+                        ")
+                    />
                 </Item>
             </Container>
         }
