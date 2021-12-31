@@ -18,6 +18,6 @@ jobs:
         toolchain: nightly
     - uses: jetli/trunk-action@v0.1.0
       with:
-         version: 'nightly'
+         version: 'latest'
     - name: trunk build
       run: trunk build
