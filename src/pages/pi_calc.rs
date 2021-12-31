@@ -27,6 +27,7 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 pub enum Msg {
     Calc,
     InputDigit(String),
+    CalcPi,
     Calculating,
     Calculated,
 }
@@ -60,19 +61,19 @@ impl Component for PiCalc {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         log::info!("Update: {:?}", msg);
-        let cb1 = self.link.callback(|_: Option<String>| Msg::Calculating);
-        let cb2 = self.link.callback(|_: Option<String>| Msg::Calculated);
         match msg {
             Msg::InputDigit(value) => {
                 self.state.digit = value;
             }
             Msg::Calc => {
-                cb1.emit(None);
+                let batch = vec![Msg::Calculating, Msg::CalcPi, Msg::Calculated];
+                self.link.send_message_batch(batch);
+            }
+            Msg::CalcPi => {
                 let n: i64 = self.state.digit.parse().unwrap();
                 let t: BigDecimal = gauss_legendre(n);
                 log::info!("result: {:?}", t);
                 self.state.result = t;
-                cb2.emit(None);
             }
             Msg::Calculating => {
                 self.state.calculating = true;
