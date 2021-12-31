@@ -1,7 +1,7 @@
 [build]
 target = "index.html"
 dist = "dist"
-public_url = "/yew_template/"
+public_url = "https://tubone24.github.io/yew_template/"
 
 [clean]
 dist = "dist"
