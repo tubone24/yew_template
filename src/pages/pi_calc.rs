@@ -1,4 +1,3 @@
-use std::ffi::c_void;
 use crate::logics::pi_calc::gauss_legendre;
 use std::str::FromStr;
 use std::fmt::{Debug};
@@ -25,7 +24,6 @@ use bigdecimal::{BigDecimal, ToPrimitive};
 
 #[derive(Debug)]
 pub enum Msg {
-    Calc,
     InputDigit(String),
     CalcPi,
     Calculating,
@@ -64,10 +62,6 @@ impl Component for PiCalc {
         match msg {
             Msg::InputDigit(value) => {
                 self.state.digit = value;
-            }
-            Msg::Calc => {
-                let batch = vec![Msg::Calculating, Msg::CalcPi, Msg::Calculated];
-                self.link.send_message_batch(batch);
             }
             Msg::CalcPi => {
                 let n: i64 = self.state.digit.parse().unwrap();
@@ -111,7 +105,7 @@ impl Component for PiCalc {
                 </Item>
                 <Item layouts=vec!(ItemLayout::ItM(12))>
                     {"precision: "} <input type="text" value=self.state.digit.clone()  oninput=self.link.callback(|e:InputData| Msg::InputDigit(e.value))/>
-                    <button onclick=self.link.callback(|_| Msg::Calc)>{ "Calc" }</button>
+                    <button onclick=self.link.batch_callback(|_| vec![Msg::Calculating, Msg::CalcPi, Msg::Calculated])>{ "Calc" }</button>
                 </Item>
                 <Item layouts=vec!(ItemLayout::ItM(12))>
                     <Text
